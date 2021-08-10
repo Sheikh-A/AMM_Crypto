@@ -54,8 +54,11 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 	elif self.tokenB.address == sell_token:
 		self.tokenA.transfer(msg.sender, sell_quantity)
 		self.tokenB.transferFrom(msg.sender, self, sell_quantity)
-		self.tokenBQty = self.tokenBQty + sell_quantity
+		
 		self.tokenAQty = self.tokenAQty - sell_quantity
+		self.tokenBQty = self.tokenBQty + sell_quantity
+		
+		
 
 
 
