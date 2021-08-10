@@ -20,15 +20,13 @@ def get_token_address(token: uint256) -> address:
 # Sets the on chain market maker with its owner, and initial token quantities transfer
 @external
 def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity: uint256, tokenB_quantity: uint256):
-    assert self.invariant == 0 #This ensures that liquidity can only be provided once
+	assert self.invariant == 0 #This ensures that liquidity can only be provided once
     #Your code here
     #Add Token address
 	self.tokenA = ERC20(tokenA_addr)
     self.tokenAQty = tokenA_quantity
-
 	self.tokenB = ERC20(tokenB_addr)
     self.tokenBQty = tokenB_quantity
-    
 	self.invariant = self.tokenBQty * self.tokenAQty
     #Add ownder
 	self.owner = msg.sender
@@ -45,9 +43,8 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
     assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
     #Your code here
     if self.tokenA.address == sell_token:
-        self.tokenA.transferFrom(msg.sender,self.tokenA.address,sell_quantity)
+    	self.tokenA.transferFrom(msg.sender,self.tokenA.address,sell_quantity)
 		self.tokenAQty = self.tokenAQty + sell_quantity
-		
 		self.tokenB.transferFrom(self.tokenB.address, msg.sender, self.invariant / self.tokenAQty)
 		#ADD value
 		self.tokenBQty = self.tokenBQty - (self.invariant / self.tokenAQty)
