@@ -55,8 +55,7 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 		self.tokenB.transferFrom(msg.sender, self, sell_quantity)
 		self.tokenBQty += sell_quantity
 		self.tokenAQty -= sell_quantity
-	else:
-		assert("Error")
+
 
 
 	#Your code here
