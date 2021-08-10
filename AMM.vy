@@ -56,7 +56,7 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 		self.tokenBQty += sell_quantity
 		self.tokenAQty -= sell_quantity
 	else:
-		print("Error check code")
+		assert("Error")
 
 
 	#Your code here
