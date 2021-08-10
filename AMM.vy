@@ -36,17 +36,19 @@ def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity
 
 	self.invariant =  self.tokenBQty * self.tokenAQty
 	#CODE PROVIDED
-	
+
 	assert self.invariant > 0
 
 # Trades one token for the other
 @external
 def tradeTokens(sell_token: address, sell_quantity: uint256):
 	assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
-	if sell_token == self.tokenA.address:
+	if  self.tokenA.address == sell_token:
+		#Start if Block
 		self.tokenB.transfer(msg.sender, sell_quantity)
 		self.tokenA.transferFrom(msg.sender, self, sell_quantity)
-		self.tokenBQty -= sell_quantity
+		
+		self.tokenBQty = self.tokenBQty - sell_quantity
 		self.tokenAQty += sell_quantity
 	elif sell_token == self.tokenB.address:
 		self.tokenA.transfer(msg.sender, sell_quantity)
