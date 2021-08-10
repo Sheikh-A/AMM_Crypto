@@ -1,4 +1,3 @@
-
 from vyper.interfaces import ERC20
 
 tokenAQty: public(uint256) #Quantity of tokenA held by the contract
@@ -20,34 +19,35 @@ def get_token_address(token: uint256) -> address:
 # Sets the on chain market maker with its owner, and initial token quantities transfer
 @external
 def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity: uint256, tokenB_quantity: uint256):
-	assert self.invariant == 0 #This ensures that liquidity can only be provided once
-	self.tokenA = ERC20(tokenA_addr)
+    assert self.invariant == 0 #This ensures that liquidity can only be provided once
+    #Your code here
     self.tokenAQty = tokenA_quantity
-	self.tokenB = ERC20(tokenB_addr)
     self.tokenBQty = tokenB_quantity
-	self.invariant = self.tokenBQty * self.tokenAQty
-    #Add ownder
-	self.owner = msg.sender
-    #Fill in messeage sender
-	self.tokenA.transferFrom(msg.sender, self.tokenA.address, tokenA_quantity)
-    #Transfer msg sender
-	self.tokenB.transferFrom(msg.sender, self.tokenB.address, tokenB_quantity)
-    #assert value
-	assert self.invariant > 0
+    self.tokenA = ERC20(tokenA_addr)
+    self.tokenB = ERC20(tokenB_addr)
+    self.invariant = self.tokenAQty * self.tokenBQty
+    self.owner = msg.sender
+    self.tokenA.transferFrom(msg.sender, self.tokenA.address, tokenA_quantity)
+    self.tokenB.transferFrom(msg.sender, self.tokenB.address, tokenB_quantity)
+    assert self.invariant > 0
 
 # Trades one token for the other
 @external
 def tradeTokens(sell_token: address, sell_quantity: uint256):
     assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
     #Your code here
-    if self.tokenA.address == sell_token:
-    	self.tokenA.transferFrom(msg.sender,self.tokenA.address,sell_quantity)
-		self.tokenAQty = self.tokenAQty + sell_quantity
-		self.tokenB.transferFrom(self.tokenB.address, msg.sender, self.invariant / self.tokenAQty)
-		#ADD value
-		self.tokenBQty = self.tokenBQty - (self.invariant / self.tokenAQty)
-        
-		self.invariant = self.tokenBQty * self.tokenAQty
+    if sell_token == self.tokenA.address:
+        self.tokenA.transferFrom(msg.sender,self.tokenA.address,sell_quantity)
+        self.tokenAQty = self.tokenAQty + sell_quantity
+        self.tokenB.transferFrom(self.tokenB.address, msg.sender, self.tokenBQty - (self.invariant / self.tokenAQty))
+        self.tokenBQty = self.invariant / self.tokenAQty
+#        self.invariant = self.tokenAQty * self.tokenBQty
+    else:
+        self.tokenB.transferFrom(msg.sender,self.tokenB.address,sell_quantity)
+        self.tokenBQty = self.tokenBQty + sell_quantity
+#        self.tokenA.transferFrom(self.tokenA.address, msg.sender, self.tokenAQty - self.invariant / self.tokenBQty)
+        self.tokenAQty = self.invariant / self.tokenBQty
+#        self.invariant = self.tokenAQty * self.tokenBQty
 
 # Owner can withdraw their funds and destroy the market maker
 @external
@@ -55,5 +55,4 @@ def ownerWithdraw():
     assert self.owner == msg.sender
     #Your code here
     self.tokenA.transferFrom(self.tokenA.address, msg.sender, self.tokenAQty)
-    #TOKEN B
-	self.tokenB.transferFrom(self.tokenB.address, msg.sender, self.tokenBQty)
+    self.tokenB.transferFrom(self.tokenB.address, msg.sender, self.tokenBQty)
